@@ -3,6 +3,7 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
+import configurationExist from '../utils/configurationExist';
 
 async function build(configId: string) {
 	const start = Date.now();
@@ -49,6 +50,10 @@ async function build(configId: string) {
 }
 
 export async function GET({ params }) {
+	if (!await configurationExist(params.configId)) {
+		return new Response('404 Not Found', { status: 404 });
+	}
+
 	async function createIframeWrapper() {
 		return await build(params.configId);
 	}
