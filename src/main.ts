@@ -18,7 +18,7 @@ interface IframeConfig {
 	BORDER: string;
 	BACKGROUND: string;
 	ID: string;
-	ALIGN: string;
+	ALIGN: 'top' | 'bottom' | 'left' | 'right' | 'center';
 	ANIMATION: AnimationConfig;
 }
 
