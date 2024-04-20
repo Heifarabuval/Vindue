@@ -128,7 +128,7 @@ const toggleIframe = (create: boolean): void => {
 
 	if (create) {
 		const iframe = document.createElement('iframe');
-		iframe.src = `${CONFIG.SERVER_URL}/render/${CONFIG.CONFIG_ID}`;
+		iframe.src = `${CONFIG.SERVER_URL}/${CONFIG.CONFIG_ID}/render`;
 		iframe.id = CONFIG.IFRAME.ID;
 
 		Object.assign(iframe.style, {
