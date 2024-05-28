@@ -49,7 +49,7 @@ const CONFIG: Config = {
 	SERVER_URL: 'http://localhost:5173',
 	IFRAME: {
 		WIDTH: '100vw',
-		HEIGHT: '50vh',
+		HEIGHT: '100vh',
 		Z_INDEX: '2147483646',
 		BORDER: 'none',
 		BACKGROUND: 'transparent',

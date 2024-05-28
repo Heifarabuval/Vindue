@@ -3,7 +3,7 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
-import configurationExist from '../utils/configurationExist';
+import { configurationService } from '../../../lib/services/configuration';
 
 async function build(configId: string) {
 	const start = Date.now();
@@ -50,7 +50,7 @@ async function build(configId: string) {
 }
 
 export async function GET({ params }) {
-	if (!await configurationExist(params.configId)) {
+	if (!await configurationService.documentExists(params.configId)) {
 		return new Response('404 Not Found', { status: 404 });
 	}
 

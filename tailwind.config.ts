@@ -3,9 +3,9 @@ import { join } from 'path';
 import type { Config } from 'tailwindcss';
 
 import { skeleton } from '@skeletonlabs/tw-plugin';
-
+import { myCustomTheme } from './my-custom-theme'
 const config = {
-	darkMode: 'class',
+	darkMode: 'selector',
 	content: [
 		'./src/**/*.{html,js,svelte,ts}',
 		join(require.resolve(
@@ -16,9 +16,16 @@ const config = {
 	theme: {
 		extend: {},
 	},
+
+	safelist: ["hover:text-teal-600"],
 	plugins: [
 		skeleton({
-			themes: { preset: [ "wintry" ] }
+			themes: {
+				preset:["modern"],
+				custom: [
+					myCustomTheme
+				]
+			}
 		})
 	]
 } satisfies Config;
