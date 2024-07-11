@@ -4,6 +4,7 @@ import type { Config } from 'tailwindcss';
 
 import { skeleton } from '@skeletonlabs/tw-plugin';
 import { myCustomTheme } from './my-custom-theme'
+const colorsNumbers = Array.from({ length: 9 }, (_, i) => (i + 1) * 100);
 const config = {
 	darkMode: 'selector',
 	content: [
@@ -16,8 +17,7 @@ const config = {
 	theme: {
 		extend: {},
 	},
-
-	safelist: ["hover:text-teal-600"],
+	safelist: ["hover:text-teal-600",...colorsNumbers.map((color) => `bg-secondary-${color}`)],
 	plugins: [
 		skeleton({
 			themes: {
