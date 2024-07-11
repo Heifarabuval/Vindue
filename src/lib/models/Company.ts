@@ -7,10 +7,3 @@ export interface Company {
 	createAt?: Date;
 	projects?: DocumentReference<Project>[] | string[]
 }
-
-
-export interface CompanyFirebase {
-	name: string;
-	createAt: Date;
-	projects: string[];
-}
