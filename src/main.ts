@@ -1,7 +1,7 @@
 /*-----------------------------------------------*/
 //@ts-expect-error __PROPS__ is replaced with the configId in the build process
 // in src/routes/[configId]/build/+server.ts
-const { __CONFIG_ID__ } = __PROPS__;
+const { __CONFIG_ID__, __CONFIG__ } = __PROPS__;
 /*-----------------------------------------------*/
 
 // Configuration
@@ -43,6 +43,9 @@ interface Config {
 	WRAPPER: WrapperConfig;
 }
 
+const configuration = JSON.parse(__CONFIG__);
+console.log(configuration.mainSettings);
+
 const CONFIG: Config = {
 	CONFIG_ID: __CONFIG_ID__,
 	ROOT_ELEMENT_ID: 'root',
@@ -54,11 +57,11 @@ const CONFIG: Config = {
 		BORDER: 'none',
 		BACKGROUND: 'transparent',
 		ID: 'pf-iframe',
-		ALIGN: 'center', // top, bottom, left, right, center
+		ALIGN: "center",
 		ANIMATION: {
-			FROM: 'top',
-			DURATION: '250ms',
-			TRANSITION: 'ease-in'
+			FROM: configuration.mainSettings.from,
+			DURATION: `${configuration.mainSettings.duration}ms`,
+			TRANSITION: 'ease-in-out'
 		}
 	},
 	WRAPPER: {
@@ -69,7 +72,7 @@ const CONFIG: Config = {
 		HEIGHT: '100vh',
 		TOP: '0',
 		LEFT: '0',
-		BACKGROUND_COLOR: 'rgba(0, 0, 0, 0.5)',
+		BACKGROUND_COLOR: 'transparent',
 		BLUR: '5px',
 		Z_INDEX: '2147483645'
 	}
@@ -138,7 +141,8 @@ const toggleIframe = (create: boolean): void => {
 			border: CONFIG.IFRAME.BORDER,
 			background: CONFIG.IFRAME.BACKGROUND,
 			margin: calculateMargin(CONFIG.IFRAME.ALIGN),
-			transition: `transform ${CONFIG.IFRAME.ANIMATION.DURATION} ${CONFIG.IFRAME.ANIMATION.TRANSITION}`,
+			"transition-duration": `${CONFIG.IFRAME.ANIMATION.DURATION}`,
+			"transition-timing-function":`${CONFIG.IFRAME.ANIMATION.TRANSITION}`,
 			transform: calculateTransform(CONFIG.IFRAME.ANIMATION.FROM)
 		});
 

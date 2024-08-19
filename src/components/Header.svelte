@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Navbar from './Navbar.svelte';
 	import type { NavItem } from '$lib/interfaces/Navbar';
-	import img from '$lib/assets/adf-logo.png';
+	import img from '$lib/assets/logo.png';
 
 	const items:NavItem[] = [
 		{label: 'Companies', href: '/admin/companies'}

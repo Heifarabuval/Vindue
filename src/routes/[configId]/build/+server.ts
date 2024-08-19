@@ -18,6 +18,7 @@ async function build(configId: string) {
 		plugins: plugins,
 	} as RollupOptions;
 
+	const configuration = await configurationService.getDocument(configId);
 	const outputOptions = [
 		{
 			file: `dist/${configId}/bundle.js`,
@@ -25,7 +26,7 @@ async function build(configId: string) {
 			sourcemap:false,
 			plugins: [
 				replace({
-					__PROPS__: JSON.stringify({ __CONFIG_ID__: configId}),
+					__PROPS__: JSON.stringify({ __CONFIG_ID__: configId,__CONFIG__: JSON.stringify(configuration)})
 				})
 			]
 		},

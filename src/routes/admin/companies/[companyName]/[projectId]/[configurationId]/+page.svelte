@@ -1,36 +1,27 @@
 <script lang="ts">
-	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+	import { Accordion, AccordionItem, RangeSlider } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import type { Container } from '$lib/models/Container';
 	import { configurationService } from '$lib/services/configuration';
 	import { availableModules } from '$lib/models/Modules';
+	import type { ConfigurationDao, ConfigurationDto } from '$lib/models/Configuration';
+	import constants from '$lib/utils/constants';
 
-	const AVAILABLE_LAYOUTS = ['simple', 'double'];
-
-	interface ConfigurationDao {
-		name: string;
-		steps: { [key: number]: Container[] };
-	}
-
-	interface ConfigurationDto {
-		name: string;
-		steps: { [key: number]: Container };
-	}
-
-	enum NumberOfItemsInLayout {
-		simple = 1,
-		double = 2
-	}
 
 	let configuration: ConfigurationDao = {
 		name: '',
-		steps: {}
+		steps: {},
+		mainSettings:{
+			backgroundColor: '#ea8e05',
+			width: 100,
+			height: 100,
+			alignment: 'top',
+		}
 	};
 
 	onMount(async () => {
 		const fetchedConfig = await configurationService.getDocument($page.params.configurationId);
-		configuration = daoToDto(fetchedConfig);
+		configuration = daoToDto({...configuration, ...fetchedConfig});
 	});
 
 	function updateConfiguration() {
@@ -38,12 +29,12 @@
 		configurationService.updateDocument($page.params.configurationId, flattenedConfiguration);
 	}
 
-	function flattenConfiguration(config: ConfigurationDao): ConfigurationDto {
+	function flattenConfiguration(configuration: ConfigurationDao): ConfigurationDto {
 		const steps: ConfigurationDto['steps'] = {};
-		Object.keys(config.steps).forEach((stepIndex) => {
-			steps[stepIndex as unknown as number] = config.steps[stepIndex as unknown as number][0];
+		Object.keys(configuration.steps).forEach((stepIndex) => {
+			steps[stepIndex as unknown as number] = configuration.steps[stepIndex as unknown as number][0];
 		});
-		return { name: config.name, steps };
+		return { ...configuration, steps };
 	}
 
 	function daoToDto(configuration: ConfigurationDao): ConfigurationDao {
@@ -51,7 +42,7 @@
 		Object.keys(configuration.steps).forEach(stepIndex => {
 			newSteps[stepIndex as unknown as number] = [configuration.steps[stepIndex as unknown as number]];
 		});
-		return { name: configuration.name, steps: newSteps };
+		return { ...configuration, steps: newSteps };
 	}
 
 	function addStep() {
@@ -80,8 +71,53 @@
 	}
 </script>
 
-<form on:submit|preventDefault={updateConfiguration}>
+<form on:submit|preventDefault={updateConfiguration} class="flex flex-col items-center">
 	<button type="button" on:click={addStep} class="btn mb-2">+</button>
+	<!-- Modal settings -->
+	<div class="flex justify-evenly w-[90%] border-2 border-tertiary-200 rounded-md p-7 m-4">
+		<input   type="color" bind:value={configuration.mainSettings.backgroundColor} class="input my-auto"/>
+		<div class="flex-col flex justify-evenly">
+			<label>
+				Transition:
+				<select bind:value={configuration.mainSettings.transition} name="transition"  class="select">
+					{#each constants.TRANSITION_VALUES as transition_val}
+						<option value={transition_val}>{transition_val}</option>
+					{/each}
+				</select>
+			</label>
+			<label>
+				Modal from:
+				<select bind:value={configuration.mainSettings.from}  name="from" class="select">
+					{#each constants.ALIGNMENT_VALUES as from_val}
+						<option value={from_val}>{from_val}</option>
+					{/each}
+				</select>
+			</label>
+			<label>
+				Transition duration in ms:
+			<input name="duration" type="number" bind:value={configuration.mainSettings.duration} class="input" placeholder="Duration"/>
+			</label>
+		</div>
+		<label>
+			Alignment:
+			<select bind:value={configuration.mainSettings.alignment}  name="alignment"  class="select">
+				{#each constants.ALIGNMENT_VALUES as alignment_val}
+					<option value={alignment_val}>{alignment_val}</option>
+				{/each}
+			</select>
+		</label>
+		<div >
+			<RangeSlider  name="width" bind:value={configuration.mainSettings.width} max={100} step={1}>Width: {configuration?.mainSettings?.width}</RangeSlider>
+			<RangeSlider name="height" bind:value={configuration.mainSettings.height} max={100} step={1}>Height: {configuration?.mainSettings?.height}</RangeSlider>
+		</div>
+	</div>
+
+	<!-- Actions-->
+	<div class="w-full flex justify-evenly">
+		<a target="_blank" class="anchor cursor-pointer" href="http://localhost:5173/{$page.params.configurationId}/build">Build</a>
+		<a target="_blank" class="anchor cursor-pointer" href="http://localhost:5173/{$page.params.configurationId}/render">View</a>
+		<a target="_blank" class="anchor cursor-pointer" href="http://localhost:5173/{$page.params.configurationId}">Get integration code</a>
+	</div>
 	<Accordion class="p-6 max-h-[69vh] overflow-y-scroll" autocollapse={true} caretOpen="rotate-180">
 		{#each Object.values(configuration.steps) as [step], i}
 			<AccordionItem class={`bg-secondary-${100 * (((i + 1) % 10) || 10)} rounded-2xl m-auto opacity-70`}>
@@ -93,12 +129,12 @@
 				</svelte:fragment>
 				<svelte:fragment slot="content">
 					<select bind:value={step.layout} class="select">
-						{#each AVAILABLE_LAYOUTS as layout}
+						{#each constants.AVAILABLE_LAYOUTS as layout}
 							<option value={layout}>{layout}</option>
 						{/each}
 					</select>
 					<div class="flex justify-evenly">
-						{#each Array.from({ length: NumberOfItemsInLayout[step.layout] || 1 }) as p, j}
+						{#each Array.from({ length: constants.NumberOfItemsInLayout[step.layout] || 1 }) as p, j}
 							<div class="bg-gradient-to-b from-surface-300 to-surface-100 p-5 rounded-xl w-full m-4 shadow-lg">
 								{#if (step.modules && step.modules[j]?.name)}
 									<select value={step.modules[j].name} on:change={(e) => handleModuleChange(i, j, e?.target?.value)}>
